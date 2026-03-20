@@ -1,315 +1,264 @@
 ﻿<div class="min-h-screen bg-gray-900 text-gray-100 font-sans flex flex-col md:flex-row">
-      
-      <!-- SIDEBAR -->
-      <aside class="w-full md:w-72 bg-black border-r border-gray-800 flex flex-col flex-shrink-0">
+  <aside class="w-full md:w-72 bg-black border-r border-gray-800 flex flex-col flex-shrink-0">
+    <div class="p-6">
+      <h1 class="text-2xl font-bold flex items-center gap-3 text-teal-400 mb-8">
+        <fa-icon [icon]="faDnaIcon" class="text-3xl"></fa-icon> Nano-PDCA
+      </h1>
+      <nav class="space-y-2 flex flex-col gap-3">
+        <button (click)="activeTab.set('active')" [class.bg-gray-800]="activeTab() === 'active'"
+          class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 transition flex items-center gap-3 text-gray-300 hover:text-white">
+          <fa-icon [icon]="faFlaskIcon" class="text-lg"></fa-icon> Лаборатория (Do)
+        </button>
+        <button (click)="activeTab.set('plan')" [class.bg-gray-800]="activeTab() === 'plan'"
+          class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 transition flex items-center gap-3 text-gray-300 hover:text-white">
+          <fa-icon [icon]="faSproutIcon" class="text-lg"></fa-icon> Новый цикл (Plan)
+        </button>
+        <button (click)="activeTab.set('archive')" [class.bg-gray-800]="activeTab() === 'archive'"
+          class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 transition flex items-center gap-3 text-gray-300 hover:text-white">
+          <fa-icon [icon]="faFolderIcon" class="text-lg"></fa-icon> Архив
+        </button>
+      </nav>
+    </div>
+    <div class="mt-auto p-6 bg-gray-950 text-sm text-gray-500">
+      <h3 class="font-bold text-gray-400 mb-2 uppercase text-xs tracking-wider">Философия</h3>
+      <ul class="space-y-2 pl-1">
+        <li class="flex gap-2"><fa-icon [icon]="faDotIcon" class="text-xs mt-1"></fa-icon> <span>Маленькие шаги</span>
+        </li>
+        <li class="flex gap-2"><fa-icon [icon]="faDotIcon" class="text-xs mt-1"></fa-icon> <span>Ошибка = Данные</span>
+        </li>
+        <li class="flex gap-2"><fa-icon [icon]="faDotIcon" class="text-xs mt-1"></fa-icon> <span>Сначала Check</span>
+        </li>
+      </ul>
+    </div>
+  </aside>
+  <main class="flex-1 p-4 md:p-10 overflow-y-auto">
+    <div *ngIf="activeTab() === 'plan'" class="max-w-2xl mx-auto animate-fade-in">
+      <h2 class="text-3xl font-bold mb-2 text-white">Plan: Гипотеза</h2>
+      <p class="text-gray-400 mb-8">Сформулируй изменение на ближайшие 3-5 дней.</p>
+      <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-xl">
+        <form (ngSubmit)="createCycle()">
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-400 mb-2">Название эксперимента</label>
+            <input type="text" [(ngModel)]="newCycle.title" name="title" required
+              placeholder="Напр: Ложиться на 20 мин раньше"
+              class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition">
+          </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-400 mb-2">Гипотеза (Зачем это нужно?)</label>
+            <textarea [(ngModel)]="newCycle.hypothesis" name="hypothesis" required placeholder="Я думаю, что если..."
+              class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 h-32 text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"></textarea>
+          </div>
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-400 mb-2">Дата и время начала</label>
+            <input type="datetime-local" [(ngModel)]="newCycle.startDate" name="startDate" required
+              class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-teal-500 outline-none">
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 items-center">
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-2">Категория</label>
+              <select [(ngModel)]="newCycle.category" name="category"
+                class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-teal-500 outline-none custom-select">
+                <option value="Религия">Религия</option>
+                <option value="Обучение">Обучение</option>
+                <option value="Продуктивность">Продуктивность</option>
+                <option value="Зависимость">Борьба с зависимостью</option>
+                <option value="Режим">Режим</option>
+                <option value="Другое">Другое</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-400 mb-2">
+                Длительность: <span class="text-teal-400 font-bold">{{ newCycle.duration }} дн.</span>
+              </label>
+              <input type="range" [(ngModel)]="newCycle.duration" name="duration" min="1" max="14"
+                class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-teal-500">
+            </div>
+          </div>
+          <button type="submit" [disabled]="!newCycle.title || !newCycle.hypothesis || !newCycle.startDate"
+            class="w-full bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition transform active:scale-95 shadow-lg shadow-teal-900/20 flex items-center justify-center gap-2">
+            <fa-icon [icon]="faRocketIcon"></fa-icon> Запустить эксперимент
+          </button>
+        </form>
+      </div>
+    </div>
+    <div *ngIf="activeTab() === 'active'" class="max-w-4xl mx-auto space-y-6 animate-fade-in">
+      <div *ngIf="activeCycles().length === 0" class="text-center py-20">
+        <div class="text-6xl mb-6 grayscale opacity-30"><fa-icon [icon]="faFlaskIcon" class="text-6xl"></fa-icon></div>
+        <h3 class="text-2xl font-bold text-gray-300 mb-2">Лаборатория пуста</h3>
+        <p class="text-gray-500 mb-6">Самое время проверить новую гипотезу.</p>
+        <button (click)="activeTab.set('plan')"
+          class="bg-teal-600 hover:bg-teal-500 text-white px-8 py-3 rounded-lg font-bold transition">
+          Создать
+        </button>
+      </div>
+      <div *ngFor="let cycle of activeCycles()"
+        class="bg-gray-800 rounded-xl overflow-hidden shadow-xl border border-gray-700">
+        <div class="p-6 border-b border-gray-700 flex justify-between items-start bg-gray-800/50">
+          <div>
+            <span class="text-xs font-bold text-teal-400 uppercase tracking-widest mb-1 block">{{ cycle.category
+              }}</span>
+            <h3 class="text-xl font-bold text-white">{{ cycle.title }}</h3>
+          </div>
+          <span
+            class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-gray-700 text-gray-300 border border-gray-600">
+            Этап: {{ cycle.phase }}
+          </span>
+        </div>
         <div class="p-6">
-          <h1 class="text-2xl font-bold flex items-center gap-3 text-teal-400 mb-8">
-            <span class="text-3xl">🧬</span> Nano-PDCA
-          </h1>
-          
-          <nav class="space-y-2">
-            <button 
-              (click)="activeTab.set('active')" 
-              [class.bg-gray-800]="activeTab() === 'active'"
-              class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 transition flex items-center gap-3 text-gray-300 hover:text-white">
-              <span>🧪</span> Лаборатория (Do)
-            </button>
-            <button 
-              (click)="activeTab.set('plan')" 
-              [class.bg-gray-800]="activeTab() === 'plan'"
-              class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 transition flex items-center gap-3 text-gray-300 hover:text-white">
-              <span>🌱</span> Новый цикл (Plan)
-            </button>
-            <button 
-              (click)="activeTab.set('archive')" 
-              [class.bg-gray-800]="activeTab() === 'archive'"
-              class="w-full text-left px-4 py-3 rounded-lg hover:bg-gray-800 transition flex items-center gap-3 text-gray-300 hover:text-white">
-              <span>📂</span> Архив
-            </button>
-          </nav>
-        </div>
-
-        <div class="mt-auto p-6 bg-gray-950 text-sm text-gray-500">
-          <h3 class="font-bold text-gray-400 mb-2 uppercase text-xs tracking-wider">Философия</h3>
-          <ul class="space-y-2 pl-1">
-            <li class="flex gap-2"><span>🔹</span> Маленькие шаги</li>
-            <li class="flex gap-2"><span>🔹</span> Ошибка = Данные</li>
-            <li class="flex gap-2"><span>🔹</span> Сначала Check</li>
-          </ul>
-        </div>
-      </aside>
-
-      <!-- MAIN CONTENT -->
-      <main class="flex-1 p-4 md:p-10 overflow-y-auto">
-        
-        <!-- VIEW: PLAN -->
-        <div *ngIf="activeTab() === 'plan'" class="max-w-2xl mx-auto animate-fade-in">
-          <h2 class="text-3xl font-bold mb-2 text-white">Plan: Гипотеза</h2>
-          <p class="text-gray-400 mb-8">Сформулируй изменение на ближайшие 3-5 дней.</p>
-
-          <div class="bg-gray-800 p-8 rounded-2xl border border-gray-700 shadow-xl">
-            <form (ngSubmit)="createCycle()">
-              
-              <!-- Title -->
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-400 mb-2">Название эксперимента</label>
-                <input 
-                  type="text" 
-                  [(ngModel)]="newCycle.title" 
-                  name="title"
-                  required
-                  placeholder="Напр: Ложиться на 20 мин раньше" 
-                  class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
-                >
-              </div>
-
-              <!-- Hypothesis -->
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-400 mb-2">Гипотеза (Зачем это нужно?)</label>
-                <textarea 
-                  [(ngModel)]="newCycle.hypothesis" 
-                  name="hypothesis"
-                  required
-                  placeholder="Я думаю, что если..." 
-                  class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 h-32 text-white focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition"
-                ></textarea>
-              </div>
-
-              <!-- Start Date -->
-              <div class="mb-6">
-                <label class="block text-sm font-medium text-gray-400 mb-2">Дата и время начала</label>
-                <input 
-                  type="datetime-local" 
-                  [(ngModel)]="newCycle.startDate" 
-                  name="startDate"
-                  required
-                  class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-teal-500 outline-none"
-                >
-              </div>
-
-              <!-- Settings Grid -->
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 items-center">
-                <div>
-                  <label class="block text-sm font-medium text-gray-400 mb-2">Категория</label>
-                  <select 
-                    [(ngModel)]="newCycle.category" 
-                    name="category"
-                    class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:ring-2 focus:ring-teal-500 outline-none custom-select"
-                  >
-                    <option value="Религия">Религия</option>
-                    <option value="Обучение">Обучение</option>
-                    <option value="Продуктивность">Продуктивность</option>
-                    <option value="Зависимость">Борьба с зависимостью</option>
-                    <option value="Режим">Режим</option>
-                    <option value="Другое">Другое</option>
-                  </select>
-                </div>
-                <div>
-                  <label class="block text-sm font-medium text-gray-400 mb-2">
-                    Длительность: <span class="text-teal-400 font-bold">{{ newCycle.duration }} дн.</span>
-                  </label>
-                  <input 
-                    type="range" 
-                    [(ngModel)]="newCycle.duration" 
-                    name="duration"
-                    min="1" max="14" 
-                    class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer accent-teal-500"
-                  >
-                </div>
-              </div>
-
-              <button 
-                type="submit" 
-                [disabled]="!newCycle.title || !newCycle.hypothesis || !newCycle.startDate"
-                class="w-full bg-teal-600 hover:bg-teal-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition transform active:scale-95 shadow-lg shadow-teal-900/20"
-              >
-                🚀 Запустить эксперимент
-              </button>
-            </form>
-          </div>
-        </div>
-
-        <!-- VIEW: ACTIVE (DO & CHECK & ACT) -->
-        <div *ngIf="activeTab() === 'active'" class="max-w-4xl mx-auto space-y-6 animate-fade-in">
-          
-          <div *ngIf="activeCycles().length === 0" class="text-center py-20">
-            <div class="text-6xl mb-6 grayscale opacity-30">🧪</div>
-            <h3 class="text-2xl font-bold text-gray-300 mb-2">Лаборатория пуста</h3>
-            <p class="text-gray-500 mb-6">Самое время проверить новую гипотезу.</p>
-            <button (click)="activeTab.set('plan')" class="bg-teal-600 hover:bg-teal-500 text-white px-8 py-3 rounded-lg font-bold transition">
-              Создать
-            </button>
-          </div>
-
-          <div *ngFor="let cycle of activeCycles()" class="bg-gray-800 rounded-xl overflow-hidden shadow-xl border border-gray-700">
-            
-            <!-- Card Header -->
-            <div class="p-6 border-b border-gray-700 flex justify-between items-start bg-gray-800/50">
-              <div>
-                <span class="text-xs font-bold text-teal-400 uppercase tracking-widest mb-1 block">{{ cycle.category }}</span>
-                <h3 class="text-xl font-bold text-white">{{ cycle.title }}</h3>
-              </div>
-              <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide bg-gray-700 text-gray-300 border border-gray-600">
-                Этап: {{ cycle.phase }}
+          <div *ngIf="cycle.phase === 'Do'">
+            <div class="bg-yellow-900/20 border border-yellow-700/30 p-4 rounded-lg mb-6 text-yellow-200 italic">
+              "{{ cycle.hypothesis }}"
+            </div>
+            <div class="flex justify-between text-sm font-bold mb-2 items-center">
+              <span class="text-gray-400">
+                {{ isFuture(cycle) ? 'Старт через:' : 'Осталось времени:' }}
+              </span>
+              <span class="font-mono text-lg" [class.text-red-400]="isTimeUp(cycle)"
+                [class.text-teal-400]="!isTimeUp(cycle) && !isFuture(cycle)" [class.text-yellow-400]="isFuture(cycle)">
+                {{ getCountdown(cycle) }}
               </span>
             </div>
-
-            <div class="p-6">
-              
-              <!-- PHASE: DO -->
-              <div *ngIf="cycle.phase === 'Do'">
-                <div class="bg-yellow-900/20 border border-yellow-700/30 p-4 rounded-lg mb-6 text-yellow-200 italic">
-                  "{{ cycle.hypothesis }}"
-                </div>
-
-                <div class="flex justify-between text-sm font-bold mb-2 items-center">
-                  <span class="text-gray-400">
-                    {{ isFuture(cycle) ? 'Старт через:' : 'Осталось времени:' }}
-                  </span>
-                  <!-- TIMER DISPLAY -->
-                  <span class="font-mono text-lg" 
-                    [class.text-red-400]="isTimeUp(cycle)" 
-                    [class.text-teal-400]="!isTimeUp(cycle) && !isFuture(cycle)"
-                    [class.text-yellow-400]="isFuture(cycle)"
-                  >
-                    {{ getCountdown(cycle) }}
-                  </span>
-                </div>
-                
-                <div class="w-full bg-gray-700 rounded-full h-3 mb-8 overflow-hidden">
-                  <div class="bg-teal-500 h-3 rounded-full transition-all duration-1000" [style.width.%]="getProgress(cycle)"></div>
-                </div>
-
-                <button 
-                  (click)="moveToCheck(cycle)" 
-                  class="w-full py-3 rounded-lg font-bold transition flex justify-center items-center gap-2"
-                  [ngClass]="isTimeUp(cycle) ? 'bg-teal-600 hover:bg-teal-500 text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'"
-                >
-                  {{ isTimeUp(cycle) ? 'Начать анализ (Check) 🛑' : 'Завершить досрочно ➡️' }}
-                </button>
-              </div>
-
-              <!-- PHASE: CHECK -->
-              <div *ngIf="cycle.phase === 'Check'" class="animate-fade-in">
-                <div class="bg-blue-900/20 border border-blue-700/30 p-4 rounded-lg mb-6 text-blue-200 text-sm">
-                  <b>Режим учёного:</b> Отключи эмоции. Срыв — это не грех, это сбой алгоритма. Найди причину.
-                </div>
-
-                <div class="space-y-5">
-                  <div>
-                    <label class="block text-sm font-bold text-gray-400 mb-2">Результат</label>
-                    <div class="flex gap-4">
-                      <label class="cursor-pointer flex items-center gap-2 bg-gray-900 p-3 rounded-lg border border-gray-700 hover:border-teal-500 transition">
-                        <input type="radio" [(ngModel)]="checkForm[cycle.id].successLevel" value="Успех" class="accent-teal-500"> Успех
-                      </label>
-                      <label class="cursor-pointer flex items-center gap-2 bg-gray-900 p-3 rounded-lg border border-gray-700 hover:border-teal-500 transition">
-                        <input type="radio" [(ngModel)]="checkForm[cycle.id].successLevel" value="Частично" class="accent-teal-500"> Частично
-                      </label>
-                      <label class="cursor-pointer flex items-center gap-2 bg-gray-900 p-3 rounded-lg border border-gray-700 hover:border-teal-500 transition">
-                        <input type="radio" [(ngModel)]="checkForm[cycle.id].successLevel" value="Срыв" class="accent-teal-500"> Срыв
-                      </label>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-bold text-gray-400 mb-2">Что сработало?</label>
-                    <textarea [(ngModel)]="checkForm[cycle.id].worked" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-teal-500 outline-none" rows="2"></textarea>
-                  </div>
-                  
-                  <div>
-                    <label class="block text-sm font-bold text-red-400 mb-2">Где был сбой и почему?</label>
-                    <textarea [(ngModel)]="checkForm[cycle.id].failed" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-red-500 outline-none" rows="2"></textarea>
-                  </div>
-
-                  <div>
-                    <label class="block text-sm font-bold text-teal-400 mb-2">Главный инсайт</label>
-                    <textarea [(ngModel)]="checkForm[cycle.id].insight" class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-teal-500 outline-none" placeholder="Я понял, что..." rows="2"></textarea>
-                  </div>
-
-                  <button (click)="submitCheck(cycle)" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition">
-                    Сохранить выводы и перейти к Act ➡️
-                  </button>
+            <div class="w-full bg-gray-700 rounded-full h-3 mb-8 overflow-hidden">
+              <div class="bg-teal-500 h-3 rounded-full transition-all duration-1000"
+                [style.width.%]="getProgress(cycle)"></div>
+            </div>
+            <button (click)="moveToCheck(cycle)"
+              class="w-full py-3 rounded-lg font-bold transition flex justify-center items-center gap-2"
+              [ngClass]="isTimeUp(cycle) ? 'bg-teal-600 hover:bg-teal-500 text-white' : 'bg-gray-700 hover:bg-gray-600 text-gray-300'">
+              <span *ngIf="isTimeUp(cycle)">Начать анализ (Check) </span>
+              <span *ngIf="!isTimeUp(cycle)">Завершить досрочно </span>
+              <fa-icon [icon]="isTimeUp(cycle) ? faStopIcon : faArrowIcon"></fa-icon>
+            </button>
+          </div>
+          <div *ngIf="cycle.phase === 'Check'" class="animate-fade-in">
+            <div class="bg-blue-900/20 border border-blue-700/30 p-4 rounded-lg mb-6 text-blue-200 text-sm">
+              <b>Режим учёного:</b> Отключи эмоции. Срыв — это не грех, это сбой алгоритма. Найди причину.
+            </div>
+            <div class="space-y-5">
+              <div>
+                <label class="block text-sm font-bold text-gray-400 mb-2">Результат</label>
+                <div class="flex gap-4">
+                  <label
+                    class="cursor-pointer flex items-center gap-2 bg-gray-900 p-3 rounded-lg border border-gray-700 hover:border-teal-500 transition">
+                    <input type="radio" [(ngModel)]="checkForm[cycle.id].successLevel" value="Успех"
+                      class="accent-teal-500"> Успех
+                  </label>
+                  <label
+                    class="cursor-pointer flex items-center gap-2 bg-gray-900 p-3 rounded-lg border border-gray-700 hover:border-teal-500 transition">
+                    <input type="radio" [(ngModel)]="checkForm[cycle.id].successLevel" value="Частично"
+                      class="accent-teal-500"> Частично
+                  </label>
+                  <label
+                    class="cursor-pointer flex items-center gap-2 bg-gray-900 p-3 rounded-lg border border-gray-700 hover:border-teal-500 transition">
+                    <input type="radio" [(ngModel)]="checkForm[cycle.id].successLevel" value="Срыв"
+                      class="accent-teal-500"> Срыв
+                  </label>
                 </div>
               </div>
-
-              <!-- PHASE: ACT -->
-              <div *ngIf="cycle.phase === 'Act'" class="animate-fade-in text-center">
-                <h4 class="text-lg font-bold text-white mb-4">Какой вердикт?</h4>
-                <p class="text-gray-400 mb-6 bg-gray-900 p-4 rounded-lg italic border-l-4 border-teal-500 text-left">
-                  "{{ cycle.results?.insight }}"
-                </p>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <button (click)="finalizeAct(cycle, 'Adopted')" class="p-4 rounded-xl border border-green-800 bg-green-900/20 hover:bg-green-900/40 text-green-400 transition">
-                    <div class="text-2xl mb-1">✅</div>
-                    <div class="font-bold">Закрепить</div>
-                    <div class="text-xs opacity-70">Сработало отлично</div>
-                  </button>
-                  <button (click)="finalizeAct(cycle, 'Adjusted')" class="p-4 rounded-xl border border-blue-800 bg-blue-900/20 hover:bg-blue-900/40 text-blue-400 transition">
-                    <div class="text-2xl mb-1">🔄</div>
-                    <div class="font-bold">Улучшить</div>
-                    <div class="text-xs opacity-70">Новый цикл с правками</div>
-                  </button>
-                  <button (click)="finalizeAct(cycle, 'Abandoned')" class="p-4 rounded-xl border border-red-800 bg-red-900/20 hover:bg-red-900/40 text-red-400 transition">
-                    <div class="text-2xl mb-1">🗑</div>
-                    <div class="font-bold">Отказаться</div>
-                    <div class="text-xs opacity-70">Гипотеза неверна</div>
-                  </button>
-                </div>
+              <div>
+                <label class="block text-sm font-bold text-gray-400 mb-2">Что сработало?</label>
+                <textarea [(ngModel)]="checkForm[cycle.id].worked"
+                  class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-teal-500 outline-none"
+                  rows="2"></textarea>
               </div>
-
+              <div>
+                <label class="block text-sm font-bold text-red-400 mb-2">Где был сбой и почему?</label>
+                <textarea [(ngModel)]="checkForm[cycle.id].failed"
+                  class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-red-500 outline-none"
+                  rows="2"></textarea>
+              </div>
+              <div>
+                <label class="block text-sm font-bold text-teal-400 mb-2">Главный инсайт</label>
+                <textarea [(ngModel)]="checkForm[cycle.id].insight"
+                  class="w-full bg-gray-900 border border-gray-700 rounded-lg p-3 text-white focus:border-teal-500 outline-none"
+                  placeholder="Я понял, что..." rows="2"></textarea>
+              </div>
+              <button (click)="submitCheck(cycle)"
+                class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 rounded-lg transition flex items-center justify-center gap-2">
+                Сохранить выводы и перейти к Act <fa-icon [icon]="faArrowIcon"></fa-icon>
+              </button>
+            </div>
+          </div>
+          <div *ngIf="cycle.phase === 'Act'" class="animate-fade-in text-center">
+            <h4 class="text-lg font-bold text-white mb-4">Какой вердикт?</h4>
+            <p class="text-gray-400 mb-6 bg-gray-900 p-4 rounded-lg italic border-l-4 border-teal-500 text-left">
+              "{{ cycle.results?.insight }}"
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+              <button (click)="finalizeAct(cycle, 'Adopted')"
+                class="p-4 rounded-xl border border-green-800 bg-green-900/20 hover:bg-green-900/40 text-green-400 transition">
+                <div class="text-2xl mb-1"><fa-icon [icon]="faCheckIcon"></fa-icon></div>
+                <div class="font-bold">Закрепить</div>
+                <div class="text-xs opacity-70">Сработало отлично</div>
+              </button>
+              <button (click)="finalizeAct(cycle, 'Adjusted')"
+                class="p-4 rounded-xl border border-blue-800 bg-blue-900/20 hover:bg-blue-900/40 text-blue-400 transition">
+                <div class="text-2xl mb-1"><fa-icon [icon]="faRefreshIcon"></fa-icon></div>
+                <div class="font-bold">Улучшить</div>
+                <div class="text-xs opacity-70">Новый цикл с правками</div>
+              </button>
+              <button (click)="finalizeAct(cycle, 'Abandoned')"
+                class="p-4 rounded-xl border border-red-800 bg-red-900/20 hover:bg-red-900/40 text-red-400 transition">
+                <div class="text-2xl mb-1"><fa-icon [icon]="faTrashIcon"></fa-icon></div>
+                <div class="font-bold">Отказаться</div>
+                <div class="text-xs opacity-70">Гипотеза неверна</div>
+              </button>
             </div>
           </div>
         </div>
-
-        <!-- VIEW: ARCHIVE -->
-        <div *ngIf="activeTab() === 'archive'" class="max-w-4xl mx-auto animate-fade-in">
-          <h2 class="text-3xl font-bold mb-6 text-white">Архив данных</h2>
-
-          <!-- Stats -->
-          <div class="grid grid-cols-3 gap-4 mb-8">
-            <div class="bg-gray-800 p-4 rounded-xl text-center border border-gray-700">
-              <div class="text-3xl font-bold text-white">{{ completedCycles().length }}</div>
-              <div class="text-xs text-gray-500 uppercase mt-1">Всего</div>
-            </div>
-            <div class="bg-gray-800 p-4 rounded-xl text-center border border-gray-700">
-              <div class="text-3xl font-bold text-green-500">{{ countDecision('Adopted') }}</div>
-              <div class="text-xs text-gray-500 uppercase mt-1">Внедрено</div>
-            </div>
-            <div class="bg-gray-800 p-4 rounded-xl text-center border border-gray-700">
-              <div class="text-3xl font-bold text-blue-500">{{ countDecision('Adjusted') }}</div>
-              <div class="text-xs text-gray-500 uppercase mt-1">Улучшено</div>
-            </div>
+      </div>
+    </div>
+    <div *ngIf="activeTab() === 'archive'" class="max-w-4xl mx-auto animate-fade-in">
+      <h2 class="text-3xl font-bold mb-6 text-white">Архив данных</h2>
+      <div class="grid grid-cols-4 gap-4 mb-8">
+        <div class="bg-gray-800 p-4 rounded-xl text-center border border-gray-700 flex flex-col items-center">
+          <fa-icon [icon]="faChartIcon" class="text-2xl text-teal-400 mb-2"></fa-icon>
+          <div class="text-3xl font-bold text-white">{{ completedCycles().length }}</div>
+          <div class="text-xs text-gray-500 uppercase mt-1">Всего</div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-xl text-center border border-gray-700 flex flex-col items-center">
+          <fa-icon [icon]="faCheckIcon" class="text-2xl text-green-500 mb-2"></fa-icon>
+          <div class="text-3xl font-bold text-green-500">{{ countDecision('Adopted') }}</div>
+          <div class="text-xs text-gray-500 uppercase mt-1">Внедрено</div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-xl text-center border border-gray-700 flex flex-col items-center">
+          <fa-icon [icon]="faRefreshIcon" class="text-2xl text-blue-500 mb-2"></fa-icon>
+          <div class="text-3xl font-bold text-blue-500">{{ countDecision('Adjusted') }}</div>
+          <div class="text-xs text-gray-500 uppercase mt-1">Улучшено</div>
+        </div>
+        <div class="bg-gray-800 p-4 rounded-xl text-center border border-gray-700 flex flex-col items-center">
+          <fa-icon [icon]="faTrashIcon" class="text-2xl text-red-500 mb-2"></fa-icon>
+          <div class="text-3xl font-bold text-red-500">{{ countDecision('Abandoned') }}</div>
+          <div class="text-xs text-gray-500 uppercase mt-1">Провалено</div>
+        </div>
+      </div>
+      <div *ngIf="completedCycles().length === 0" class="text-center text-gray-600 py-10">
+        Архив пока пуст.
+      </div>
+      <div class="space-y-4">
+        <div *ngFor="let cycle of completedCycles()"
+          class="bg-gray-800 p-5 rounded-xl border-l-4 shadow-md transition hover:bg-gray-750"
+          [class.border-green-500]="cycle.finalDecision === 'Adopted'"
+          [class.border-blue-500]="cycle.finalDecision === 'Adjusted'"
+          [class.border-red-500]="cycle.finalDecision === 'Abandoned'">
+          <div class="flex justify-between items-start mb-2">
+            <h4 class="font-bold text-white text-lg flex items-center gap-2">
+              <fa-icon *ngIf="cycle.finalDecision === 'Adopted'" [icon]="faCheckIcon" class="text-green-500"></fa-icon>
+              <fa-icon *ngIf="cycle.finalDecision === 'Adjusted'" [icon]="faRefreshIcon"
+                class="text-blue-500"></fa-icon>
+              <fa-icon *ngIf="cycle.finalDecision === 'Abandoned'" [icon]="faTrashIcon" class="text-red-500"></fa-icon>
+              {{ cycle.title }}
+            </h4>
+            <button (click)="deleteCycle(cycle.id)" class="text-gray-600 hover:text-red-500 transition">
+              <fa-icon [icon]="faCloseIcon" class="text-xl"></fa-icon>
+            </button>
           </div>
-
-          <div *ngIf="completedCycles().length === 0" class="text-center text-gray-600 py-10">
-            Архив пока пуст.
-          </div>
-
-          <div class="space-y-4">
-            <div *ngFor="let cycle of completedCycles()" class="bg-gray-800 p-5 rounded-xl border-l-4 shadow-md transition hover:bg-gray-750"
-              [class.border-green-500]="cycle.finalDecision === 'Adopted'"
-              [class.border-blue-500]="cycle.finalDecision === 'Adjusted'"
-              [class.border-red-500]="cycle.finalDecision === 'Abandoned'"
-            >
-              <div class="flex justify-between items-start mb-2">
-                <h4 class="font-bold text-white text-lg flex items-center gap-2">
-                  <span *ngIf="cycle.finalDecision === 'Adopted'">✅</span>
-                  <span *ngIf="cycle.finalDecision === 'Adjusted'">🔄</span>
-                  <span *ngIf="cycle.finalDecision === 'Abandoned'">🗑</span>
-                  {{ cycle.title }}
-                </h4>
-                <button (click)="deleteCycle(cycle.id)" class="text-gray-600 hover:text-red-500 transition">
-                  <span class="text-xl">×</span>
-                </button>
-              </div>
-              <div class="text-xs text-gray-500 mb-3">{{ cycle.endDate | date:'mediumDate' }} • {{ cycle.category }}</div>
-              <div *ngIf="cycle.results?.insight" class="bg-gray-900 p-3 rounded text-gray-300 text-sm italic">
-                "{{ cycle.results?.insight }}"
-              </div>
-            </div>
+          <div class="text-xs text-gray-500 mb-3">{{ cycle.endDate | date:'mediumDate' }} • {{ cycle.category }}</div>
+          <div *ngIf="cycle.results?.insight" class="bg-gray-900 p-3 rounded text-gray-300 text-sm italic">
+            "{{ cycle.results?.insight }}"
           </div>
         </div>
-
-      </main>
+      </div>
+    </div>
+  </main>
 </div>

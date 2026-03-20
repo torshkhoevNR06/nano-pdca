@@ -1,59 +1,69 @@
-# NanoPdca
+# Nano-PDCA
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.5.
+Минималистичное приложение для управления личными экспериментами через методику PDCA (План → Делай → Проверяй → Трансформируй).
 
-## Development server
+## Что это?
 
-To start a local development server, run:
+**PDCA** — цикл непрерывного улучшения:
+- **План** (Plan): Сформулируй гипотезу и цель на 3-14 дней
+- **Делай** (Do): Выполняй эксперимент в течение установленного срока
+- **Проверяй** (Check): Анализируй результаты, что сработало, где был сбой
+- **Трансформируй** (Act): Реши — внедрить, переделать или отказаться
 
-```bash
-ng serve
+## Основной функционал
+
+- 📋 **Лаборатория** — активные эксперименты с таймером обратного отсчёта
+- 🌱 **Новый цикл** — создание экспериментов с категоризацией
+- 📊 **Архив** — статистика всех завершённых циклов (внедрено, улучшено, провалено)
+- 💾 **Локальное хранилище** — все данные сохраняются в браузере
+
+## Структура проекта
+
+```
+src/
+├── app/
+│   ├── app.ts           # основной компонент с логикой
+│   ├── app.html         # шаблон UI
+│   ├── app.css          # стили (Tailwind CSS)
+│   ├── app.routes.ts    # маршруты
+│   └── app.config.ts    # конфигурация на Angular
+├── interfaces/
+│   ├── ICycle.ts        # интерфейс цикла эксперимента
+│   └── ICycleResult.ts  # интерфейс результатов анализа
+├── main.ts              # точка входа
+└── styles.css           # глобальные стили
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+## Установка
 
 ```bash
-ng generate component component-name
+npm install
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Разработка
 
 ```bash
-ng generate --help
+npm start
 ```
 
-## Building
+Приложение откроется на `http://localhost:4200/`.
 
-To build the project run:
+## Сборка
 
 ```bash
-ng build
+npm run build            # обычная сборка
+npm run build:github     # сборка для GitHub Pages
+npm run deploy           # сборка и деплой на GitHub Pages
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## Тесты
 
 ```bash
-ng test
+npm test
 ```
 
-## Running end-to-end tests
+## Деплой
 
-For end-to-end (e2e) testing, run:
+Проект автоматически деплоится на GitHub Pages при push в main ветку. 
 
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Подробнее см. [GITHUB_SETUP.md](GITHUB_SETUP.md).

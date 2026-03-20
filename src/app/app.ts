@@ -1,21 +1,35 @@
 ﻿import { Component, OnInit, OnDestroy, signal, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
+import {
+  faDna,
+  faFlaskVial,
+  faSprout,
+  faFolderOpen,
+  faRocket,
+  faCheckCircle,
+  faArrowRight,
+  faCircleCheck,
+  faRotate,
+  faTrash,
+  faTimes,
+  faStop,
+  faCircle,
+  faChartLine
+} from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, FontAwesomeModule],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
 export class App implements OnInit, OnDestroy {
-  // --- SIGNALS (STATE) ---
   activeTab = signal<'active' | 'plan' | 'archive'>('active');
   cycles = signal<Cycle[]>([]);
   now = signal<Date>(new Date());
-  
-  // Temporary state for forms
   newCycle = {
     title: '',
     hypothesis: '',
@@ -26,12 +40,40 @@ export class App implements OnInit, OnDestroy {
 
   checkForm: Record<string, CycleResult> = {};
   private timerId: any;
-
-  // --- COMPUTED SIGNALS ---
   activeCycles = computed(() => this.cycles().filter(c => c.status === 'active'));
   completedCycles = computed(() => this.cycles().filter(c => c.status === 'completed').reverse());
+  faDnaIcon = faDna;
+  faFlaskIcon = faFlaskVial;
+  faSproutIcon = faSprout;
+  faFolderIcon = faFolderOpen;
+  faRocketIcon = faRocket;
+  faCheckIcon = faCircleCheck;
+  faArrowIcon = faArrowRight;
+  faRefreshIcon = faRotate;
+  faTrashIcon = faTrash;
+  faCloseIcon = faTimes;
+  faStopIcon = faStop;
+  faDotIcon = faCircle;
+  faChartIcon = faChartLine;
+  
+  constructor(private faIconLibrary: FaIconLibrary) {
+    this.faIconLibrary.addIcons(
+      faDna,
+      faFlaskVial,
+      faSprout,
+      faFolderOpen,
+      faRocket,
+      faCheckCircle,
+      faArrowRight,
+      faCircleCheck,
+      faRotate,
+      faTrash,
+      faTimes,
+      faStop,
+      faCircle,
+      faChartLine
+    );
 
-  constructor() {
     effect(() => {
       localStorage.setItem('nano_pdca_cycles', JSON.stringify(this.cycles()));
     });
@@ -51,8 +93,6 @@ export class App implements OnInit, OnDestroy {
         console.error('Error loading data', e);
       }
     }
-
-    // Start Timer to update 'now' every second
     this.timerId = setInterval(() => {
       this.now.set(new Date());
     }, 1000);
@@ -64,13 +104,10 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  // --- ACTIONS ---
-
   createCycle() {
     const start = new Date(this.newCycle.startDate);
     const end = new Date(start);
     end.setDate(start.getDate() + this.newCycle.duration);
-
     const cycle: Cycle = {
       id: crypto.randomUUID(),
       title: this.newCycle.title,
@@ -84,37 +121,28 @@ export class App implements OnInit, OnDestroy {
       results: null,
       finalDecision: null
     };
-
     this.cycles.update(list => [...list, cycle]);
     this.initCheckForm(cycle.id);
-    
-    // Reset form
-    this.newCycle = { 
-      title: '', 
-      hypothesis: '', 
-      category: 'Зависимость', 
+    this.newCycle = {
+      title: '',
+      hypothesis: '',
+      category: 'Зависимость',
       duration: 3,
       startDate: this.getCurrentDateTimeLocal()
     };
     this.activeTab.set('active');
   }
 
-  // --- TIMER LOGIC ---
-
   getCountdown(cycle: Cycle): string {
     const now = this.now().getTime();
     const start = new Date(cycle.startDate).getTime();
     const end = new Date(cycle.endDate).getTime();
-
-    // If future start
     if (now < start) {
        const diff = start - now;
        return this.formatDuration(diff);
     }
-
     const diff = end - now;
     if (diff <= 0) return '00д 00ч 00м 00с';
-
     return this.formatDuration(diff);
   }
 
@@ -151,18 +179,17 @@ export class App implements OnInit, OnDestroy {
 
   submitCheck(cycle: Cycle) {
     const result = this.checkForm[cycle.id];
-    this.updateCycle(cycle.id, { 
-      phase: 'Act', 
-      results: result 
+    this.updateCycle(cycle.id, {
+      phase: 'Act',
+      results: result
     });
   }
 
   finalizeAct(cycle: Cycle, decision: 'Adopted' | 'Adjusted' | 'Abandoned') {
-    this.updateCycle(cycle.id, { 
-      status: 'completed', 
-      finalDecision: decision 
+    this.updateCycle(cycle.id, {
+      status: 'completed',
+      finalDecision: decision
     });
-    
     if (decision === 'Adjusted') {
       alert('Данные сохранены в архив. Теперь создай новый цикл с учетом этих данных!');
       this.activeTab.set('plan');
@@ -175,17 +202,14 @@ export class App implements OnInit, OnDestroy {
     }
   }
 
-  // --- HELPERS ---
-
   private getCurrentDateTimeLocal(): string {
     const now = new Date();
-    // Adjust for timezone to get local ISO string format correct for input
     const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
     return local.toISOString().slice(0, 16);
   }
-
+  
   private updateCycle(id: string, changes: Partial<Cycle>) {
-    this.cycles.update(list => 
+    this.cycles.update(list =>
       list.map(c => c.id === id ? { ...c, ...changes } : c)
     );
   }
@@ -198,8 +222,9 @@ export class App implements OnInit, OnDestroy {
       insight: ''
     };
   }
-
+  
   countDecision(type: string) {
     return this.completedCycles().filter(c => c.finalDecision === type).length;
   }
+
 }
